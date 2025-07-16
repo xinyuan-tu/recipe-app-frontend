@@ -10,6 +10,7 @@ function App() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [recipeCache, setRecipeCache] = useState<{ [key: string]: string }>({});
+  const [activeSearch, setActiveSearch] = useState<string>('');
 
   const handleSearch = async (query: string) => {
     if (!history.includes(query)) {
@@ -49,6 +50,40 @@ function App() {
     }
   };
 
+  const handleImageSearch = async (file: File) => {
+    const fileName = file.name;
+    setActiveSearch(fileName);
+    if (!history.includes(fileName)) {
+      setHistory(prevHistory => [fileName, ...prevHistory]);
+    }
+
+    setIsLoading(true);
+    setError('');
+    setRecipe('');
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      const response = await fetch('http://localhost:3000/api/recipe-from-image', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get recipe from image. Please try again.');
+      }
+
+      const data = await response.json();
+      setRecipe(data.recipe);
+      setRecipeCache(prevCache => ({ ...prevCache, [fileName]: data.recipe }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -58,7 +93,7 @@ function App() {
       <main className="main-content">
         <h1>Recipe Finder</h1>
         <div className="search-container">
-          <Search onSearch={handleSearch} />
+          <Search onSearch={handleSearch} onImageUpload={handleImageSearch} />
         </div>
         <div className="results-container">
           <Results recipe={recipe} isLoading={isLoading} error={error} />

@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 
 type SearchProps = {
   onSearch: (query: string) => void;
+  onImageUpload: (file: File) => void;
 };
 
-const Search: React.FC<SearchProps> = ({ onSearch }) => {
+const Search: React.FC<SearchProps> = ({ onSearch, onImageUpload }) => {
   const [query, setQuery] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSearchClick = () => {
     if (query.trim()) {
@@ -20,6 +22,17 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     }
   };
 
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onImageUpload(file);
+    }
+  };
+
   return (
     <>
       <input
@@ -30,6 +43,14 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
         placeholder="Enter a food name"
       />
       <button onClick={handleSearchClick}>Search</button>
+      <button onClick={handleUploadClick}>Upload Image</button>
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+        accept="image/*"
+      />
     </>
   );
 };
