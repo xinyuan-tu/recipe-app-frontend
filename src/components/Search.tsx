@@ -43,7 +43,7 @@ const Search: React.FC<SearchProps> = ({ onSearch, onImageUpload }) => {
         placeholder="Enter a food name"
       />
       <button onClick={handleSearchClick}>Search</button>
-      <button onClick={handleUploadClick}>Upload Image</button>
+      <button onClick={handleUploadClick} style={{ marginLeft: '0.5rem' }}>Upload Image</button>
       <input
         type="file"
         ref={fileInputRef}

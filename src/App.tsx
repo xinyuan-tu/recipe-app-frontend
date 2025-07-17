@@ -3,13 +3,14 @@ import './App.css';
 import History from './components/History';
 import Search from './components/Search';
 import Results from './components/Results';
+import type { Recipe } from './types';
 
 function App() {
   const [history, setHistory] = useState<string[]>([]);
-  const [recipe, setRecipe] = useState<string>('');
+  const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [recipeCache, setRecipeCache] = useState<{ [key: string]: string }>({});
+  const [recipeCache, setRecipeCache] = useState<{ [key: string]: Recipe }>({});
   const [activeSearch, setActiveSearch] = useState<string>('');
 
   const handleSearch = async (query: string) => {
@@ -19,7 +20,7 @@ function App() {
 
     setIsLoading(true);
     setError('');
-    setRecipe('');
+    setRecipe(null);
 
     if (recipeCache[query]) {
       setRecipe(recipeCache[query]);
@@ -41,8 +42,8 @@ function App() {
       }
 
       const data = await response.json();
-      setRecipe(data.recipe);
-      setRecipeCache(prevCache => ({ ...prevCache, [query]: data.recipe }));
+      setRecipe(data);
+      setRecipeCache(prevCache => ({ ...prevCache, [query]: data }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
@@ -51,15 +52,9 @@ function App() {
   };
 
   const handleImageSearch = async (file: File) => {
-    const fileName = file.name;
-    setActiveSearch(fileName);
-    if (!history.includes(fileName)) {
-      setHistory(prevHistory => [fileName, ...prevHistory]);
-    }
-
     setIsLoading(true);
     setError('');
-    setRecipe('');
+    setRecipe(null);
 
     const formData = new FormData();
     formData.append('image', file);
@@ -75,8 +70,15 @@ function App() {
       }
 
       const data = await response.json();
-      setRecipe(data.recipe);
-      setRecipeCache(prevCache => ({ ...prevCache, [fileName]: data.recipe }));
+      const { foodName, recipe: recipeData } = data; // Rename to avoid conflict
+
+      setActiveSearch(foodName);
+      if (!history.includes(foodName)) {
+        setHistory(prevHistory => [foodName, ...prevHistory]);
+      }
+      
+      setRecipe(data);
+      setRecipeCache(prevCache => ({ ...prevCache, [foodName]: data }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
@@ -88,7 +90,11 @@ function App() {
     <div className="app">
       <aside className="sidebar">
         <h2>History</h2>
-        <History items={history} onItemClick={handleSearch} />
+        <History
+          items={history}
+          activeItem={activeSearch}
+          onItemClick={handleSearch}
+        />
       </aside>
       <main className="main-content">
         <h1>Recipe Finder</h1>

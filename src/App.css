@@ -47,6 +47,10 @@
   background-color: #D7CCC8;
 }
 
+.sidebar li.active {
+  background-color: #D7CCC8;
+}
+
 .main-content {
   flex-grow: 1;
   padding: 2rem;
@@ -81,4 +85,37 @@
 
 .results-container {
   width: 100%;
+  max-width: 800px; /* Give the recipe card a max width */
+}
+
+.recipe-card {
+  background-color: #FFF;
+  border: 1px solid #D7CCC8;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: left;
+}
+
+.recipe-card h1 {
+  margin-top: 0;
+}
+
+.recipe-card .description {
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.recipe-card .details {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1.5rem;
+  background-color: #F5F5F5;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.recipe-card h2 {
+  border-bottom: 2px solid #FF8A65;
+  padding-bottom: 0.5rem;
+  margin-top: 2rem;
 }
