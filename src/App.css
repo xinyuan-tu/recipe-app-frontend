@@ -4,28 +4,49 @@
   width: 100vw;
 }
 
+.sidebar-container {
+  position: relative; /* Needed for positioning the toggle button */
+  height: 100%;
+}
+
 .sidebar {
   width: 60px; /* Collapsed width */
+  height: 100%;
   background-color: #EFEBE9;
   padding: 1rem;
   border-right: 1px solid #D7CCC8;
   transition: width 0.3s ease;
-  overflow: hidden; /* Hide content when collapsed */
+  overflow-x: hidden;
 }
 
-.sidebar:hover {
+.sidebar.expanded {
   width: 250px; /* Expanded width */
 }
 
-.sidebar > * {
+.sidebar h2, .sidebar ul {
   opacity: 0;
-  transition: opacity 0.2s linear;
+  transition: opacity 0.2s ease;
   white-space: nowrap;
 }
 
-.sidebar:hover > * {
+.sidebar.expanded h2, .sidebar.expanded ul {
   opacity: 1;
-  transition-delay: 0.1s; /* Wait a moment before fading in content */
+  transition-delay: 0.2s;
+}
+
+.sidebar-toggle-icons {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: #888; /* A visible grey color */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar.expanded .sidebar-toggle-icons {
+  color: #5D4037;
 }
 
 .sidebar ul {
@@ -57,6 +78,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow-y: auto; /* Allow this section to scroll */
+}
+
+.search-wrapper {
+  text-align: center;
+  transition: all 0.5s ease;
+}
+
+.main-content.centered .search-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
 }
 
 .search-container {
@@ -94,6 +129,14 @@
   border-radius: 8px;
   padding: 2rem;
   text-align: left;
+}
+
+.recipe-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
 }
 
 .recipe-card h1 {

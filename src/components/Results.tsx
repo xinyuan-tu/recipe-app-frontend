@@ -5,9 +5,10 @@ type ResultsProps = {
   recipe: Recipe | null;
   isLoading: boolean;
   error: string;
+  imageUrl?: string;
 };
 
-const Results: React.FC<ResultsProps> = ({ recipe, isLoading, error }) => {
+const Results: React.FC<ResultsProps> = ({ recipe, isLoading, error, imageUrl }) => {
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -17,11 +18,12 @@ const Results: React.FC<ResultsProps> = ({ recipe, isLoading, error }) => {
   }
 
   if (!recipe) {
-    return <div>Your search results will appear here.</div>;
+    return null; // Render nothing if there are no results
   }
 
   return (
     <div className="recipe-card">
+      {imageUrl && <img src={imageUrl} alt="Uploaded food" className="recipe-image" />}
       <h1>{recipe.foodName}</h1>
       <p className="description">{recipe.description}</p>
       

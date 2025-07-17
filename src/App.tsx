@@ -4,6 +4,7 @@ import History from './components/History';
 import Search from './components/Search';
 import Results from './components/Results';
 import type { Recipe } from './types';
+import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 
 function App() {
   const [history, setHistory] = useState<string[]>([]);
@@ -12,8 +13,11 @@ function App() {
   const [error, setError] = useState<string>('');
   const [recipeCache, setRecipeCache] = useState<{ [key: string]: Recipe }>({});
   const [activeSearch, setActiveSearch] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>('');
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
   const handleSearch = async (query: string) => {
+    setActiveSearch(query);
     if (!history.includes(query)) {
       setHistory(prevHistory => [query, ...prevHistory]);
     }
@@ -23,10 +27,16 @@ function App() {
     setRecipe(null);
 
     if (recipeCache[query]) {
-      setRecipe(recipeCache[query]);
+      const cachedRecipe = recipeCache[query];
+      setRecipe(cachedRecipe);
+      setImageUrl(cachedRecipe.imageUrl || '');
       setIsLoading(false);
       return;
     }
+
+    setImageUrl(''); // Clear image on new text search
+    setIsLoading(true);
+    setError('');
 
     try {
       const response = await fetch('http://localhost:3000/api/get-recipe', {
@@ -52,6 +62,13 @@ function App() {
   };
 
   const handleImageSearch = async (file: File) => {
+    // Create a temporary URL for the image to display it immediately
+    if (imageUrl) {
+      URL.revokeObjectURL(imageUrl); // Clean up previous object URL
+    }
+    const objectUrl = URL.createObjectURL(file);
+    setImageUrl(objectUrl);
+
     setIsLoading(true);
     setError('');
     setRecipe(null);
@@ -70,15 +87,15 @@ function App() {
       }
 
       const data = await response.json();
-      const { foodName, recipe: recipeData } = data; // Rename to avoid conflict
+      const recipeWithImage = { ...data, imageUrl: objectUrl };
 
-      setActiveSearch(foodName);
-      if (!history.includes(foodName)) {
-        setHistory(prevHistory => [foodName, ...prevHistory]);
+      setActiveSearch(recipeWithImage.foodName);
+      if (!history.includes(recipeWithImage.foodName)) {
+        setHistory(prevHistory => [recipeWithImage.foodName, ...prevHistory]);
       }
       
-      setRecipe(data);
-      setRecipeCache(prevCache => ({ ...prevCache, [foodName]: data }));
+      setRecipe(recipeWithImage);
+      setRecipeCache(prevCache => ({ ...prevCache, [recipeWithImage.foodName]: recipeWithImage }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
@@ -88,21 +105,32 @@ function App() {
 
   return (
     <div className="app">
-      <aside className="sidebar">
-        <h2>History</h2>
-        <History
-          items={history}
-          activeItem={activeSearch}
-          onItemClick={handleSearch}
-        />
-      </aside>
-      <main className="main-content">
-        <h1>Recipe Finder</h1>
-        <div className="search-container">
-          <Search onSearch={handleSearch} onImageUpload={handleImageSearch} />
+      <div 
+        className="sidebar-container"
+        onMouseEnter={() => setIsSidebarExpanded(true)}
+        onMouseLeave={() => setIsSidebarExpanded(false)}
+      >
+        <aside className={`sidebar ${isSidebarExpanded ? 'expanded' : ''}`}>
+          <div className="sidebar-toggle-icons">
+            {isSidebarExpanded ? <FaChevronLeft /> : <FaChevronRight />}
+          </div>
+          <h2>History</h2>
+          <History
+            items={history}
+            activeItem={activeSearch}
+            onItemClick={handleSearch}
+          />
+        </aside>
+      </div>
+      <main className={`main-content ${!recipe && !isLoading && !error ? 'centered' : ''}`}>
+        <div className="search-wrapper">
+          <h1>Recipe Finder</h1>
+          <div className="search-container">
+            <Search onSearch={handleSearch} onImageUpload={handleImageSearch} />
+          </div>
         </div>
         <div className="results-container">
-          <Results recipe={recipe} isLoading={isLoading} error={error} />
+          <Results recipe={recipe} isLoading={isLoading} error={error} imageUrl={imageUrl} />
         </div>
       </main>
     </div>
