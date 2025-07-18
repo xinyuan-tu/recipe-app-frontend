@@ -39,7 +39,7 @@ function App() {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:3000/api/get-recipe', {
+      const response = await fetch('https://recipe-app-backend-efir.onrender.com/api/get-recipe', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ function App() {
     formData.append('image', file);
 
     try {
-      const response = await fetch('http://localhost:3000/api/recipe-from-image', {
+      const response = await fetch('https://recipe-app-backend-efir.onrender.com/api/recipe-from-image', {
         method: 'POST',
         body: formData,
       });
