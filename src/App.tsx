@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import History from './components/History';
 import Search from './components/Search';
 import Results from './components/Results';
 import type { Recipe } from './types';
-import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
+import { FaChevronRight, FaChevronLeft, FaBars } from 'react-icons/fa';
 
 function App() {
   const [history, setHistory] = useState<string[]>([]);
@@ -15,6 +15,29 @@ function App() {
   const [activeSearch, setActiveSearch] = useState<string>('');
   const [imageUrl, setImageUrl] = useState<string>('');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const [isMobileSidebarVisible, setIsMobileSidebarVisible] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarVisible(!isMobileSidebarVisible);
+  };
+
+  const handleHistoryItemClick = (query: string) => {
+    handleSearch(query);
+    if (window.innerWidth <= 768) {
+      setIsMobileSidebarVisible(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileSidebarVisible(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSearch = async (query: string) => {
     setActiveSearch(query);
@@ -104,11 +127,17 @@ function App() {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${isMobileSidebarVisible ? 'sidebar-visible' : ''}`}>
+      <button className="mobile-menu-toggle" onClick={toggleMobileSidebar}>
+        <FaBars />
+      </button>
+
+      <div className="overlay" onClick={toggleMobileSidebar}></div>
+
       <div 
         className="sidebar-container"
-        onMouseEnter={() => setIsSidebarExpanded(true)}
-        onMouseLeave={() => setIsSidebarExpanded(false)}
+        onMouseEnter={() => !isMobileSidebarVisible && setIsSidebarExpanded(true)}
+        onMouseLeave={() => !isMobileSidebarVisible && setIsSidebarExpanded(false)}
       >
         <aside className={`sidebar ${isSidebarExpanded ? 'expanded' : ''}`}>
           <div className="sidebar-toggle-icons">
@@ -118,7 +147,7 @@ function App() {
           <History
             items={history}
             activeItem={activeSearch}
-            onItemClick={handleSearch}
+            onItemClick={handleHistoryItemClick}
           />
         </aside>
       </div>

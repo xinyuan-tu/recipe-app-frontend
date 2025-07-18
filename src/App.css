@@ -1,3 +1,17 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+}
+
 .app {
   display: flex;
   height: 100vh;
@@ -161,4 +175,113 @@
   border-bottom: 2px solid #FF8A65;
   padding-bottom: 0.5rem;
   margin-top: 2rem;
+}
+
+.mobile-menu-toggle {
+  display: none; /* Hidden by default */
+}
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+/* Responsive Design for Mobile Devices */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+    overflow-x: hidden; /* Prevent horizontal scroll when sidebar slides */
+  }
+
+  .sidebar-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    background-color: #EFEBE9;
+    width: 250px;
+    border-right: 1px solid #D7CCC8;
+  }
+
+  .app.sidebar-visible .sidebar-container {
+    transform: translateX(0);
+  }
+
+  .app.sidebar-visible .overlay {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%; /* Take full width of the container */
+  }
+
+  .sidebar.expanded {
+    width: 100%;
+  }
+
+  .sidebar h2, .sidebar ul {
+    opacity: 1;
+    transition: none;
+  }
+
+  .sidebar.expanded h2, .sidebar.expanded ul {
+    transition-delay: 0s;
+  }
+  
+  .sidebar-toggle-icons {
+    display: none; /* Hide desktop toggle */
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: #5D4037;
+  }
+
+  .app.sidebar-visible .mobile-menu-toggle {
+    display: none;
+  }
+
+  .main-content {
+    padding: 1rem;
+    padding-top: 5rem; /* Make space for the menu button */
+  }
+
+  .search-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .search-container input {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .search-container button {
+    width: 100%;
+    margin-left: 0 !important;
+  }
+  
+  .search-container button + button {
+    margin-top: 0.5rem;
+  }
 }
